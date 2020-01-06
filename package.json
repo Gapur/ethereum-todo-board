@@ -3,24 +3,36 @@
   "version": "1.0.0",
   "description": "Blockchain Todo Board Powered By Ethereum",
   "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "dev": "lite-server",
-    "test": "echo \"Error: no test specified\" && sexit 1"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "author": "Gapur Kassym",
   "license": "ISC",
   "dependencies": {
-    "diff": ">=3.5.0"
+    "create-react-app": "^3.3.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-scripts": "^3.3.0",
+    "semantic-ui-react": "^0.88.2",
+    "web3": "^1.2.4"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
-    "lite-server": "^2.3.0",
     "truffle": "5.0.2",
     "truffle-contract": "3.0.6"
-  }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
