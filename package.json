@@ -12,6 +12,7 @@
   "author": "Gapur Kassym",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "create-react-app": "^3.3.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
