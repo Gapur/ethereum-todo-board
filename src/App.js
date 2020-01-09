@@ -1,15 +1,57 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Container, Header } from 'semantic-ui-react';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 import TodoList from './TodoList';
+import Column from './Column';
 import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config';
 
 import './App.css';
 
+const tasks = Array.from({ length: 20 }, (v, k) => k).map(
+  (val) => ({
+    id: `task-${val}`,
+    content: `Task ${val}`,
+  }),
+);
+
+const taskMap = tasks.reduce(
+  (previous, current) => {
+    previous[current.id] = current;
+    return previous;
+  },
+  {},
+);
+
+const todo = {
+  id: 'todo',
+  title: 'To do',
+  taskIds: tasks.map((task) => task.id),
+};
+
+const done = {
+  id: 'done',
+  title: 'Done',
+  taskIds: [],
+};
+
+const initial = {
+  columnOrder: [todo.id, done.id],
+  columns: {
+    [todo.id]: todo,
+    [done.id]: done,
+  },
+  tasks: taskMap,
+};
+
+const getTasks = (entities, columnId) =>
+  entities.columns[columnId].taskIds.map(
+    (taskId) => entities.tasks[taskId]);
+
 class App extends Component {
   componentWillMount() {
-    this.loadBlockchainData()
+    this.loadBlockchainData();
   }
 
   async loadBlockchainData() {
@@ -36,7 +78,10 @@ class App extends Component {
       account: '',
       taskCount: 0,
       tasks: [],
-      loading: true
+      loading: true,
+      entities: initial,
+      selectedTaskIds: [],
+      draggingTaskId: null
     }
 
     this.createTask = this.createTask.bind(this)
@@ -60,6 +105,8 @@ class App extends Component {
   }
 
   render() {
+    const { entities, selectedTaskIds } = this.state;
+
     return (
       <Container>
         <Header>Blockchain Todo Board Powered by Ethereum Smart Contracts</Header>
@@ -74,6 +121,27 @@ class App extends Component {
                   toggleCompleted={this.toggleCompleted} />
               }
             </main>
+          </div>
+          <div className="row">
+            <DragDropContext
+              onDragStart={this.onDragStart}
+              onDragEnd={this.onDragEnd}
+            >
+              <div>
+                {entities.columnOrder.map((columnId) => (
+                  <Column
+                    column={entities.columns[columnId]}
+                    tasks={getTasks(entities, columnId)}
+                    selectedTaskIds={selectedTaskIds}
+                    key={columnId}
+                    draggingTaskId={this.state.draggingTaskId}
+                    toggleSelection={this.toggleSelection}
+                    toggleSelectionInGroup={this.toggleSelectionInGroup}
+                    multiSelectTo={this.multiSelectTo}
+                  />
+                ))}
+              </div>
+            </DragDropContext>
           </div>
         </div>
       </Container>
