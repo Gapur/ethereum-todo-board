@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
+import { Grid, Header } from 'semantic-ui-react';
 
 import Task from './Task';
 
 class Column extends Component {
   render() {
-    const { column, tasks, selectedTaskIds, draggingTaskId } = this.props;
+    const {
+      column,
+      tasks,
+      selectedTaskIds,
+      draggingTaskId,
+      toggleSelection,
+      toggleSelectionInGroup,
+      multiSelectTo,
+    } = this.props;
+
     const getSelectedMap = (selectedTaskIds) =>
       selectedTaskIds.reduce((previous, current) => {
         previous[current] = true;
@@ -13,8 +23,8 @@ class Column extends Component {
       }, {});
 
     return (
-      <div>
-        <span>{column.title}</span>
+      <Grid.Column width={8}>
+        <Header>{column.title}</Header>
         <Droppable droppableId={column.id}>
           {(provided, snapshot) => (
             <div
@@ -27,15 +37,15 @@ class Column extends Component {
                 const isGhosting = isSelected && draggingTaskId && draggingTaskId !== task.id;
                 return (
                   <Task
+                    key={task.id}
                     task={task}
                     index={index}
-                    key={task.id}
                     isSelected={isSelected}
                     isGhosting={isGhosting}
                     selectionCount={selectedTaskIds.length}
-                    toggleSelection={this.props.toggleSelection}
-                    toggleSelectionInGroup={this.props.toggleSelectionInGroup}
-                    multiSelectTo={this.props.multiSelectTo}
+                    toggleSelection={toggleSelection}
+                    toggleSelectionInGroup={toggleSelectionInGroup}
+                    multiSelectTo={multiSelectTo}
                   />
                 );
               })}
@@ -43,7 +53,7 @@ class Column extends Component {
             </div>
           )}
         </Droppable>
-      </div>
+      </Grid.Column>
     );
   }
 }
