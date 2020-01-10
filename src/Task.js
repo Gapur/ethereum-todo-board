@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Card } from 'semantic-ui-react';
+import styled from 'styled-components';
+
+import colors from './colors';
 
 const primaryButton = 0;
 const keyCodes = {
@@ -10,6 +13,57 @@ const keyCodes = {
   arrowUp: 38,
   tab: 9,
 };
+const grid = 8;
+const borderRadius = 2;
+
+const getBackgroundColor = ({
+  isSelected,
+  isGhosting,
+}) => {
+  if (isGhosting) {
+    return colors.silver;
+  }
+
+  if (isSelected) {
+    return colors.dimGray;
+  }
+
+  return colors.silver;
+};
+
+const getColor = ({ isSelected, isGhosting }) => {
+  if (isGhosting) {
+    return 'darkgrey';
+  }
+  if (isSelected) {
+    return colors.dimGray;
+  }
+  return colors.silver;
+};
+
+const DraggableCard = styled.div`
+  background-color: ${props => getBackgroundColor(props)};
+  color: ${props => getColor(props)};
+  padding: ${grid}px;
+  margin-bottom: ${grid}px;
+  border-radius: ${borderRadius}px;
+  font-size: 18px;
+  border: 3px solid ${colors.N90};
+  ${props =>
+    props.isDragging ? `box-shadow: 2px 2px 1px ${colors.N90};` : ''} ${props =>
+    props.isGhosting
+      ? 'opacity: 0.8;'
+      : ''}
+
+  /* needed for SelectionCount */
+  position: relative;
+
+  /* avoid default outline which looks lame with the position: absolute; */
+  &:focus {
+    outline: none;
+    border-color: ${colors.G200};
+  }
+`;
 
 class Task extends Component {
   onKeyDown = (
@@ -97,7 +151,7 @@ class Task extends Component {
         {(provided, snapshot) => {
           const shouldShowSelection = snapshot.isDragging && selectionCount > 1;
           return (
-            <div
+            <DraggableCard
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -116,7 +170,7 @@ class Task extends Component {
                   </Card.Description>
                 </Card.Content>
               </Card>
-            </div>
+            </DraggableCard>
           );
         }}
       </Draggable>

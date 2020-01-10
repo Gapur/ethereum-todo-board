@@ -1,8 +1,30 @@
 import React, { Component } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { Grid, Header } from 'semantic-ui-react';
+import styled from 'styled-components';
 
 import Task from './Task';
+import colors from './colors';
+
+const grid = 8;
+const borderRadius = 2;
+
+const GridColumn = styled(Grid.Column)`
+  margin: ${grid}px;
+  border-radius: ${borderRadius}px;
+  border: 1px solid ${colors.silver};
+  background-color: ${colors.dimGray};
+  display: flex;
+  flex-direction: column;
+`;
+
+const TaskList = styled.div`
+  padding: ${grid}px;
+  min-height: 200px;
+  flex-grow: 1;
+  transition: background-color 0.2s ease;
+  ${props => (props.isDraggingOver ? `background-color: ${colors.silver}` : '')};
+`;
 
 class Column extends Component {
   render() {
@@ -23,11 +45,11 @@ class Column extends Component {
       }, {});
 
     return (
-      <Grid.Column width={8}>
+      <GridColumn width={4}>
         <Header>{column.title}</Header>
         <Droppable droppableId={column.id}>
           {(provided, snapshot) => (
-            <div
+            <TaskList
               ref={provided.innerRef}
               isDraggingOver={snapshot.isDraggingOver}
               {...provided.droppableProps}
@@ -50,10 +72,10 @@ class Column extends Component {
                 );
               })}
               {provided.placeholder}
-            </div>
+            </TaskList>
           )}
         </Droppable>
-      </Grid.Column>
+      </GridColumn>
     );
   }
 }

@@ -9,8 +9,6 @@ import Column from './Column';
 import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config';
 import { mutliDragAwareReorder, multiSelectTo as multiSelect } from './utils';
 
-import './App.css';
-
 const tasks = Array.from({ length: 20 }, (v, k) => k).map(
   (val) => ({
     id: `task-${val}`,
