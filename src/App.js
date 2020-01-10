@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
-import { Container, Header } from 'semantic-ui-react';
+import { Container, Header, Grid, Dimmer, Loader } from 'semantic-ui-react';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { Grid } from 'semantic-ui-react';
+import { Pane } from 'evergreen-ui';
 
-import TodoList from './components/TodoList';
-import Column from './components/Column';
+import { AnimatedButton, Column, TodoListModal } from './components';
 import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './constants/config';
 import { mutliDragAwareReorder } from './utils';
 
-const tasks = Array.from({ length: 20 }, (v, k) => k).map(
+const tasks = Array.from({ length: 8 }, (v, k) => k).map(
   (val) => ({
     id: `task-${val}`,
     content: `Task ${val}`,
@@ -50,25 +49,29 @@ const getTasks = (entities, columnId) =>
     (taskId) => entities.tasks[taskId]);
 
 class App extends Component {
-  componentWillMount() {
+  componentDidMount() {
     this.loadBlockchainData();
   }
 
   async loadBlockchainData() {
-    const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
-    const accounts = await web3.eth.getAccounts();
-    this.setState({ account: accounts[0] });
-    const todoList = new web3.eth.Contract(TODO_LIST_ABI, TODO_LIST_ADDRESS)
-    this.setState({ todoList })
-    const taskCount = await todoList.methods.taskCount().call()
-    this.setState({ taskCount })
-    for (var i = 1; i <= taskCount; i++) {
-      const task = await todoList.methods.tasks(i).call()
-      this.setState({
-        tasks: [...this.state.tasks, task]
-      })
+    try {
+      const web3 = new Web3(Web3.currentProvider || "http://localhost:7545");
+      const accounts = await web3.eth.getAccounts();
+      this.setState({ account: accounts[0] });
+      const todoList = new web3.eth.Contract(TODO_LIST_ABI, TODO_LIST_ADDRESS);
+      this.setState({ todoList });
+      const taskCount = await todoList.methods.taskCount().call();
+      this.setState({ taskCount });
+      for (var i = 1; i <= taskCount; i++) {
+        const task = await todoList.methods.tasks(i).call()
+        this.setState({
+          tasks: [...this.state.tasks, task]
+        })
+      }
+      this.setState({ loading: false });
+    } catch (err) {
+      console.log('err: ', err.message);
     }
-    this.setState({ loading: false })
   }
 
   constructor(props) {
@@ -81,6 +84,7 @@ class App extends Component {
       loading: true,
       entities: initial,
       selectedTaskIds: [],
+      showModal: false
     }
 
     this.createTask = this.createTask.bind(this)
@@ -152,46 +156,46 @@ class App extends Component {
     });
   };
 
-  createTask(content) {
+  createTask(formData) {
     this.setState({ loading: true })
-    this.state.todoList.methods.createTask(content).send({ from: this.state.account })
-    .once('receipt', (receipt) => {
-      this.setState({ loading: false })
-    })
+    this.state.todoList.methods
+      .createTask(formData.title)
+      .send({ from: this.state.account })
+      .once('receipt', () => {
+        this.setState({ loading: false, showModal: false });
+      });
   }
 
   toggleCompleted(taskId) {
     this.setState({ loading: true })
     this.state.todoList.methods.toggleCompleted(taskId).send({ from: this.state.account })
-    .once('receipt', (receipt) => {
+    .once('receipt', () => {
       this.setState({ loading: false })
-    })
+    });
   }
 
   render() {
-    const { entities, selectedTaskIds } = this.state;
-
+    const { entities, selectedTaskIds, tasks, loading, showModal } = this.state;
+    console.log('tasks', tasks);
     return (
-      <Container>
+      <Container textAlign="center">
+        <Pane height={24} />
         <Header>Blockchain Todo Board Powered by Ethereum Smart Contracts</Header>
-        <div className="container-fluid">
-          <div className="row">
-            <main role="main" className="col-lg-12 d-flex justify-content-center">
-              {this.state.loading
-                ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
-                : <TodoList
-                  tasks={this.state.tasks}
-                  createTask={this.createTask}
-                  toggleCompleted={this.toggleCompleted} />
-              }
-            </main>
-          </div>
-          <div className="row">
+        {loading ? (
+          <Dimmer active inverted><Loader /></Dimmer>
+        ) : (
+          <Pane marginBottom={16}>
+            <AnimatedButton
+              positive
+              onClick={() => this.setState({ showModal: true })}
+            >
+              Create
+            </AnimatedButton>
             <DragDropContext
               onDragStart={this.onDragStart}
               onDragEnd={this.onDragEnd}
             >
-              <Grid>
+              <Grid centered padded>
                 {entities.columnOrder.map((columnId) => (
                   <Column
                     column={entities.columns[columnId]}
@@ -204,8 +208,13 @@ class App extends Component {
                 ))}
               </Grid>
             </DragDropContext>
-          </div>
-        </div>
+          </Pane>
+        )}
+        <TodoListModal
+          showModal={showModal}
+          onClose={() => this.setState({ showModal: false })}
+          onSave={(formData) => this.createTask(formData)}
+        />
       </Container>
     );
   }
