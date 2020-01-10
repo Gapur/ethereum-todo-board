@@ -1,4 +1,4 @@
 export default {
-  dimGray: '#666666',
-  silver: '#c1c1c1',
+  pattentsBlue: '#DEE7EE',
+  spindle: '#ACC2D4',
 };

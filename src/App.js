@@ -7,7 +7,7 @@ import { Grid } from 'semantic-ui-react';
 import TodoList from './TodoList';
 import Column from './Column';
 import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config';
-import { mutliDragAwareReorder, multiSelectTo as multiSelect } from './utils';
+import { mutliDragAwareReorder } from './utils';
 
 const tasks = Array.from({ length: 20 }, (v, k) => k).map(
   (val) => ({
@@ -56,13 +56,11 @@ class App extends Component {
 
   componentDidMount() {
     window.addEventListener('click', this.onWindowClick);
-    window.addEventListener('keydown', this.onWindowKeyDown);
     window.addEventListener('touchend', this.onWindowTouchEnd);
   }
 
   componentWillUnmount() {
     window.removeEventListener('click', this.onWindowClick);
-    window.removeEventListener('keydown', this.onWindowKeyDown);
     window.removeEventListener('touchend', this.onWindowTouchEnd);
   }
 
@@ -93,7 +91,6 @@ class App extends Component {
       loading: true,
       entities: initial,
       selectedTaskIds: [],
-      draggingTaskId: null
     }
 
     this.createTask = this.createTask.bind(this)
@@ -110,20 +107,13 @@ class App extends Component {
     if (!selected) {
       this.unselectAll();
     }
-    this.setState({
-      draggingTaskId: start.draggableId,
-    });
   };
 
   onDragEnd = (result) => {
     const destination = result.destination;
     const source = result.source;
 
-    // nothing to do
     if (!destination || result.reason === 'CANCEL') {
-      this.setState({
-        draggingTaskId: null,
-      });
       return;
     }
 
@@ -134,20 +124,7 @@ class App extends Component {
       destination,
     });
 
-    this.setState({
-      ...processed,
-      draggingTaskId: null,
-    });
-  };
-
-  onWindowKeyDown = (event) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      this.unselectAll();
-    }
+    this.setState({ ...processed });
   };
 
   onWindowClick = (event) => {
@@ -211,23 +188,6 @@ class App extends Component {
     });
   };
 
-  // This behaviour matches the MacOSX finder selection
-  multiSelectTo = (newTaskId) => {
-    const updated = multiSelect(
-      this.state.entities,
-      this.state.selectedTaskIds,
-      newTaskId,
-    );
-
-    if (updated == null) {
-      return;
-    }
-
-    this.setState({
-      selectedTaskIds: updated,
-    });
-  };
-
   unselect = () => {
     this.unselectAll();
   };
@@ -255,7 +215,7 @@ class App extends Component {
   }
 
   render() {
-    const { entities, selectedTaskIds, draggingTaskId } = this.state;
+    const { entities, selectedTaskIds } = this.state;
 
     return (
       <Container>
@@ -284,10 +244,8 @@ class App extends Component {
                     tasks={getTasks(entities, columnId)}
                     selectedTaskIds={selectedTaskIds}
                     key={columnId}
-                    draggingTaskId={draggingTaskId}
                     toggleSelection={this.toggleSelection}
                     toggleSelectionInGroup={this.toggleSelectionInGroup}
-                    multiSelectTo={this.multiSelectTo}
                   />
                 ))}
               </Grid>

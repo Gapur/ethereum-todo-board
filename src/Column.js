@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { Grid, Header } from 'semantic-ui-react';
 import styled from 'styled-components';
@@ -6,78 +6,68 @@ import styled from 'styled-components';
 import Task from './Task';
 import colors from './colors';
 
-const grid = 8;
-const borderRadius = 2;
-
 const GridColumn = styled(Grid.Column)`
-  margin: ${grid}px;
-  border-radius: ${borderRadius}px;
-  border: 1px solid ${colors.silver};
-  background-color: ${colors.dimGray};
-  display: flex;
-  flex-direction: column;
+  &&&&& {
+    display: flex;
+    flex-direction: column;
+    margin-right: 8px;
+    margin-left: 8px;
+    border-radius: 2px;
+    border: 1px solid ${colors.spindle};
+    background-color: ${colors.pattentsBlue};
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 const TaskList = styled.div`
-  padding: ${grid}px;
-  min-height: 200px;
   flex-grow: 1;
   transition: background-color 0.2s ease;
-  ${props => (props.isDraggingOver ? `background-color: ${colors.silver}` : '')};
+  ${props => (props.isDraggingOver ? `background-color: ${colors.spindle}` : '')};
 `;
 
-class Column extends Component {
-  render() {
-    const {
-      column,
-      tasks,
-      selectedTaskIds,
-      draggingTaskId,
-      toggleSelection,
-      toggleSelectionInGroup,
-      multiSelectTo,
-    } = this.props;
-
-    const getSelectedMap = (selectedTaskIds) =>
-      selectedTaskIds.reduce((previous, current) => {
-        previous[current] = true;
-        return previous;
-      }, {});
-
-    return (
-      <GridColumn width={4}>
-        <Header>{column.title}</Header>
-        <Droppable droppableId={column.id}>
-          {(provided, snapshot) => (
-            <TaskList
-              ref={provided.innerRef}
-              isDraggingOver={snapshot.isDraggingOver}
-              {...provided.droppableProps}
-            >
-              {tasks.map((task, index) => {
-                const isSelected = getSelectedMap(selectedTaskIds)[task.id];
-                const isGhosting = isSelected && draggingTaskId && draggingTaskId !== task.id;
-                return (
-                  <Task
-                    key={task.id}
-                    task={task}
-                    index={index}
-                    isSelected={isSelected}
-                    isGhosting={isGhosting}
-                    selectionCount={selectedTaskIds.length}
-                    toggleSelection={toggleSelection}
-                    toggleSelectionInGroup={toggleSelectionInGroup}
-                    multiSelectTo={multiSelectTo}
-                  />
-                );
-              })}
-              {provided.placeholder}
-            </TaskList>
-          )}
-        </Droppable>
-      </GridColumn>
-    );
+const Title = styled(Header)`
+  &&& {
+    padding-left: 12px;
+    padding-right: 12px;
   }
+`;
+
+const Column = ({
+  column,
+  tasks,
+  selectedTaskIds,
+  toggleSelection,
+  toggleSelectionInGroup,
+}) => {
+  return (
+    <GridColumn width={4}>
+      <Title>{column.title}</Title>
+      <Droppable droppableId={column.id}>
+        {(provided, snapshot) => (
+          <TaskList
+            ref={provided.innerRef}
+            isDraggingOver={snapshot.isDraggingOver}
+            {...provided.droppableProps}
+          >
+            {tasks.map((task, index) => {
+              return (
+                <Task
+                  key={task.id}
+                  task={task}
+                  index={index}
+                  selectionCount={selectedTaskIds.length}
+                  toggleSelection={toggleSelection}
+                  toggleSelectionInGroup={toggleSelectionInGroup}
+                />
+              );
+            })}
+            {provided.placeholder}
+          </TaskList>
+        )}
+      </Droppable>
+    </GridColumn>
+  );
 }
 
 export default Column;
