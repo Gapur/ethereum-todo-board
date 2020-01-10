@@ -3,8 +3,8 @@ import { Droppable } from 'react-beautiful-dnd';
 import { Grid, Header } from 'semantic-ui-react';
 import styled from 'styled-components';
 
-import Task from './Task';
-import colors from './colors';
+import DraggableCard from './DraggableCard';
+import colors from '../constants/colors';
 
 const GridColumn = styled(Grid.Column)`
   &&&&& {
@@ -52,7 +52,7 @@ const Column = ({
           >
             {tasks.map((task, index) => {
               return (
-                <Task
+                <DraggableCard
                   key={task.id}
                   task={task}
                   index={index}

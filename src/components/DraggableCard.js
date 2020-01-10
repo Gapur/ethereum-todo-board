@@ -3,7 +3,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Card } from 'semantic-ui-react';
 import styled from 'styled-components';
 
-const DraggableCard = styled.div`
+const DragCard = styled.div`
   padding-left: 12px;
   padding-right: 12px;
   padding-top: 8px;
@@ -12,7 +12,7 @@ const DraggableCard = styled.div`
   position: relative;
 `;
 
-const Task = ({ task, index, selectionCount, toggleSelection, toggleSelectionInGroup }) => {
+const DraggableCard = ({ task, index, selectionCount, toggleSelection, toggleSelectionInGroup }) => {
   const onClick = (event) => {
     if (event.defaultPrevented) {
       return;
@@ -38,7 +38,7 @@ const Task = ({ task, index, selectionCount, toggleSelection, toggleSelectionInG
       {(provided, snapshot) => {
         const shouldShowSelection = snapshot.isDragging && selectionCount > 1;
         return (
-          <DraggableCard
+          <DragCard
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -54,11 +54,11 @@ const Task = ({ task, index, selectionCount, toggleSelection, toggleSelectionInG
                 </Card.Description>
               </Card.Content>
             </Card>
-          </DraggableCard>
+          </DragCard>
         );
       }}
     </Draggable>
   );
 }
 
-export default Task;
+export default DraggableCard;

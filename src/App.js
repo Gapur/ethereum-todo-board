@@ -4,9 +4,9 @@ import { Container, Header } from 'semantic-ui-react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { Grid } from 'semantic-ui-react';
 
-import TodoList from './TodoList';
-import Column from './Column';
-import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './config';
+import TodoList from './components/TodoList';
+import Column from './components/Column';
+import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './constants/config';
 import { mutliDragAwareReorder } from './utils';
 
 const tasks = Array.from({ length: 20 }, (v, k) => k).map(
