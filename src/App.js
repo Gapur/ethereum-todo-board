@@ -54,16 +54,6 @@ class App extends Component {
     this.loadBlockchainData();
   }
 
-  componentDidMount() {
-    window.addEventListener('click', this.onWindowClick);
-    window.addEventListener('touchend', this.onWindowTouchEnd);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('click', this.onWindowClick);
-    window.removeEventListener('touchend', this.onWindowTouchEnd);
-  }
-
   async loadBlockchainData() {
     const web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
     const accounts = await web3.eth.getAccounts();
@@ -102,10 +92,10 @@ class App extends Component {
     const selected = this.state.selectedTaskIds.find(
       (taskId) => taskId === id,
     );
-
-    // if dragging an item that is not selected - unselect all items
     if (!selected) {
-      this.unselectAll();
+      this.setState({
+        selectedTaskIds: [],
+      });
     }
   };
 
@@ -127,39 +117,17 @@ class App extends Component {
     this.setState({ ...processed });
   };
 
-  onWindowClick = (event) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-    this.unselectAll();
-  };
-
-  onWindowTouchEnd = (event) => {
-    if (event.defaultPrevented) {
-      return;
-    }
-    this.unselectAll();
-  };
-
   toggleSelection = (taskId) => {
     const selectedTaskIds = this.state.selectedTaskIds;
     const wasSelected = selectedTaskIds.includes(taskId);
 
     const newTaskIds = (() => {
-      // Task was not previously selected
-      // now will be the only selected item
       if (!wasSelected) {
         return [taskId];
       }
-
-      // Task was part of a selected group
-      // will now become the only selected item
       if (selectedTaskIds.length > 1) {
         return [taskId];
       }
-
-      // task was previously selected but not in a group
-      // we will now clear the selection
       return [];
     })();
 
@@ -171,30 +139,16 @@ class App extends Component {
   toggleSelectionInGroup = (taskId) => {
     const selectedTaskIds = this.state.selectedTaskIds;
     const index = selectedTaskIds.indexOf(taskId);
-
-    // if not selected - add it to the selected items
     if (index === -1) {
       this.setState({
         selectedTaskIds: [...selectedTaskIds, taskId],
       });
       return;
     }
-
-    // it was previously selected and now needs to be removed from the group
     const shallow = [...selectedTaskIds];
     shallow.splice(index, 1);
     this.setState({
       selectedTaskIds: shallow,
-    });
-  };
-
-  unselect = () => {
-    this.unselectAll();
-  };
-
-  unselectAll = () => {
-    this.setState({
-      selectedTaskIds: [],
     });
   };
 
@@ -223,7 +177,7 @@ class App extends Component {
         <div className="container-fluid">
           <div className="row">
             <main role="main" className="col-lg-12 d-flex justify-content-center">
-              { this.state.loading
+              {this.state.loading
                 ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
                 : <TodoList
                   tasks={this.state.tasks}
