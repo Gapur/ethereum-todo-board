@@ -10,7 +10,7 @@ import { CONFIG, INITIAL, TODO, DONE } from './constants';
 import { reorderSingleDrag } from './utils';
 
 const getTasks = (boardData, columnId) =>
-  boardData.columns[columnId].taskIds.map((taskId) => boardData.tasks[taskId]);
+  boardData.columns[columnId].taskIds.map(taskId => boardData.tasks[taskId]);
 
 const App = () => {
   const [account, setAccount] = useState(null);
@@ -21,42 +21,50 @@ const App = () => {
 
   const onLoadBlockchainData = async () => {
     try {
-      const web3 = new Web3(Web3.currentProvider || "http://localhost:7545");
+      const web3 = new Web3(Web3.currentProvider || 'http://localhost:7545');
       const accounts = await web3.eth.getAccounts();
       setAccount(accounts[0]);
-      const todoList = new web3.eth.Contract(CONFIG.TODO_LIST_ABI, CONFIG.TODO_LIST_ADDRESS);
-      setTodoList(todoList);
-      const taskCount = await todoList.methods.taskCount().call();
+      const web3TodoList = new web3.eth.Contract(
+        CONFIG.TODO_LIST_ABI,
+        CONFIG.TODO_LIST_ADDRESS
+      );
+      setTodoList(web3TodoList);
+      const taskCount = await web3TodoList.methods.taskCount().call();
       const tasks = {};
-      for (var i = 1; i <= taskCount; i++) {
-        const task = await todoList.methods.tasks(i).call();
+      // eslint-disable-next-line no-plusplus
+      for (let i = 1; i <= taskCount; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        const task = await web3TodoList.methods.tasks(i).call();
         tasks[task.id] = task;
       }
       INITIAL.tasks = tasks;
       INITIAL.columns[TODO.id] = {
         ...TODO,
-        taskIds: Object.keys(tasks).filter(id => !tasks[id].completed)
+        taskIds: Object.keys(tasks).filter(id => !tasks[id].completed),
       };
       INITIAL.columns[DONE.id] = {
         ...DONE,
-        taskIds: Object.keys(tasks).filter(id => tasks[id].completed)
+        taskIds: Object.keys(tasks).filter(id => tasks[id].completed),
       };
       setBoardData(INITIAL);
       setLoading(false);
     } catch (err) {
       console.log('err: ', err.message);
     }
-  }
+  };
 
   useEffect(() => {
     onLoadBlockchainData();
   }, [loading]);
 
-  const onDragEnd = (result) => {
-    const destination = result.destination;
-    const source = result.source;
-    if (!destination || result.reason === 'CANCEL'
-      || source.droppableId === destination.droppableId) {
+  const onDragEnd = result => {
+    const { destination } = result;
+    const { source } = result;
+    if (
+      !destination ||
+      result.reason === 'CANCEL' ||
+      source.droppableId === destination.droppableId
+    ) {
       return;
     }
     onToggleCompleted(result.draggableId);
@@ -74,7 +82,7 @@ const App = () => {
     todoList.methods
       .createTask(title, description)
       .send({ from: account, gas: 3000000 })
-      .once('receipt', (receipt) => {
+      .once('receipt', () => {
         Swal.fire({
           text: 'Task created successfully.',
           type: 'success',
@@ -82,9 +90,9 @@ const App = () => {
         setLoading(false);
         setShowModal(false);
       });
-  }
+  };
 
-  const onToggleCompleted = (taskId) => {
+  const onToggleCompleted = taskId => {
     setLoading(true);
     todoList.methods
       .toggleCompleted(taskId)
@@ -92,14 +100,16 @@ const App = () => {
       .once('receipt', () => {
         setLoading(false);
       });
-  }
+  };
 
   return (
     <Container textAlign="center">
       <Pane height={24} />
       <Header>Blockchain Todo Board Powered by Ethereum Smart Contracts</Header>
       {loading ? (
-        <Dimmer active inverted><Loader /></Dimmer>
+        <Dimmer active inverted>
+          <Loader />
+        </Dimmer>
       ) : (
         <Pane marginBottom={16}>
           <AnimatedButton positive onClick={() => setShowModal(true)}>
@@ -107,13 +117,13 @@ const App = () => {
           </AnimatedButton>
           <DragDropContext onDragEnd={onDragEnd}>
             <Grid centered padded>
-              {boardData.columnOrder.map((columnId) =>
+              {boardData.columnOrder.map(columnId => (
                 <Column
                   key={columnId}
                   column={boardData.columns[columnId]}
                   tasks={getTasks(boardData, columnId)}
                 />
-              )}
+              ))}
             </Grid>
           </DragDropContext>
         </Pane>
@@ -121,10 +131,10 @@ const App = () => {
       <TodoListModal
         showModal={showModal}
         onClose={() => setShowModal(false)}
-        onSave={(formData) => onCreateTask(formData)}
+        onSave={formData => onCreateTask(formData)}
       />
     </Container>
   );
-}
+};
 
 export default App;

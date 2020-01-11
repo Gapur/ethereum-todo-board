@@ -25,17 +25,19 @@ const TodoListModal = ({ showModal, onSave, onClose }) => {
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button negative onClick={onClose}>Cancel</Button>
+        <Button negative onClick={onClose}>
+          Cancel
+        </Button>
         <Button
           positive
-          icon='checkmark'
-          labelPosition='right'
-          content='Create'
+          icon="checkmark"
+          labelPosition="right"
+          content="Create"
           onClick={() => onSave(values)}
         />
       </Modal.Actions>
     </Modal>
   );
-}
+};
 
 export default TodoListModal;

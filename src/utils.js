@@ -12,19 +12,11 @@ const withNewTaskIds = (column, taskIds) => ({
   taskIds,
 });
 
-export const reorderSingleDrag = ({
-  entities,
-  source,
-  destination,
-}) => {
+export const reorderSingleDrag = ({ entities, source, destination }) => {
   // moving in the same list
   if (source.droppableId === destination.droppableId) {
     const column = entities.columns[source.droppableId];
-    const reordered = reorder(
-      column.taskIds,
-      source.index,
-      destination.index,
-    );
+    const reordered = reorder(column.taskIds, source.index, destination.index);
 
     const updated = {
       ...entities,

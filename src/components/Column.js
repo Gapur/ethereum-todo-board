@@ -23,7 +23,8 @@ const GridColumn = styled(Grid.Column)`
 const TaskList = styled.div`
   flex-grow: 1;
   transition: background-color 0.2s ease;
-  ${props => (props.isDraggingOver ? `background-color: ${colors.spindle}` : '')};
+  ${props =>
+    props.isDraggingOver ? `background-color: ${colors.spindle}` : ''};
 `;
 
 const Title = styled(Header)`
@@ -42,15 +43,16 @@ const Column = ({ column, tasks }) => {
           <TaskList
             ref={provided.innerRef}
             isDraggingOver={snapshot.isDraggingOver}
-            {...provided.droppableProps}
-          >
-            {tasks.map((task, index) => <DraggableCard key={task.id} task={task} index={index} />)}
+            {...provided.droppableProps}>
+            {tasks.map((task, index) => (
+              <DraggableCard key={task.id} task={task} index={index} />
+            ))}
             {provided.placeholder}
           </TaskList>
         )}
       </Droppable>
     </GridColumn>
   );
-}
+};
 
 export default Column;

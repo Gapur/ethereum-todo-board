@@ -20,8 +20,7 @@ const DraggableCard = ({ task, index }) => (
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          isDragging={snapshot.isDragging}
-        >
+          isDragging={snapshot.isDragging}>
           <Card>
             <Card.Content>
               <Card.Header>{task.title}</Card.Header>
