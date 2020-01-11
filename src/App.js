@@ -6,7 +6,7 @@ import { Pane } from 'evergreen-ui';
 
 import { AnimatedButton, Column, TodoListModal } from './components';
 import { CONFIG, INITIAL, TODO, DONE } from './constants';
-import { mutliDragAwareReorder } from './utils';
+import { reorderSingleDrag } from './utils';
 
 const App = () => {
   const [account, setAccount] = useState(null);
@@ -56,13 +56,14 @@ const App = () => {
       return;
     }
 
-    const processed = mutliDragAwareReorder({
+    onToggleCompleted(result.draggableId);
+
+    const newBoardData = reorderSingleDrag({
       entities: boardData,
-      selectedTaskIds: [],
       source,
       destination,
     });
-    setBoardData(processed.entities);
+    setBoardData(newBoardData);
   };
 
   const onCreateTask = (formData) => {
