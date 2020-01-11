@@ -9,15 +9,14 @@ import { AnimatedButton, Column, TodoListModal } from './components';
 import { CONFIG, INITIAL, TODO, DONE } from './constants';
 import { reorderSingleDrag } from './utils';
 
-const getTasks = (boardData, columnId) =>
-  boardData.columns[columnId].taskIds.map(taskId => boardData.tasks[taskId]);
+const getTasks = (data, columnId) =>
+  data.columns[columnId].taskIds.map(taskId => data.tasks[taskId]);
 
 const App = () => {
   const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [todoList, setTodoList] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [boardData, setBoardData] = useState(null);
+  const [data, setData] = useState(null);
 
   const onLoadBlockchainData = async () => {
     try {
@@ -46,8 +45,7 @@ const App = () => {
         ...DONE,
         taskIds: Object.keys(tasks).filter(id => tasks[id].completed),
       };
-      setBoardData(INITIAL);
-      setLoading(false);
+      setData(INITIAL);
     } catch (err) {
       console.log('err: ', err.message);
     }
@@ -55,7 +53,7 @@ const App = () => {
 
   useEffect(() => {
     onLoadBlockchainData();
-  }, [loading]);
+  }, [data]);
 
   const onDragEnd = result => {
     const { destination } = result;
@@ -70,43 +68,40 @@ const App = () => {
     onToggleCompleted(result.draggableId);
 
     const newBoardData = reorderSingleDrag({
-      entities: boardData,
+      entities: data,
       source,
       destination,
     });
-    setBoardData(newBoardData);
+    setData(newBoardData);
   };
 
   const onCreateTask = ({ title, description }) => {
-    setLoading(true);
     todoList.methods
       .createTask(title, description)
       .send({ from: account, gas: 3000000 })
-      .once('receipt', () => {
+      .once('receipt', receipt => {
+        const newTask = receipt.events.TaskCreated.returnValues;
+        const newData = {
+          ...data,
+          tasks: { ...data.tasks, [newTask.id]: newTask },
+        };
+        setData(newData);
+        setShowModal(false);
         Swal.fire({
           text: 'Task created successfully.',
           type: 'success',
         });
-        setLoading(false);
-        setShowModal(false);
       });
   };
 
-  const onToggleCompleted = taskId => {
-    setLoading(true);
-    todoList.methods
-      .toggleCompleted(taskId)
-      .send({ from: account })
-      .once('receipt', () => {
-        setLoading(false);
-      });
-  };
+  const onToggleCompleted = taskId =>
+    todoList.methods.toggleCompleted(taskId).send({ from: account });
 
   return (
     <Container textAlign="center">
       <Pane height={24} />
       <Header>Blockchain Todo Board Powered by Ethereum Smart Contracts</Header>
-      {loading ? (
+      {data === null ? (
         <Dimmer active inverted>
           <Loader />
         </Dimmer>
@@ -117,11 +112,11 @@ const App = () => {
           </AnimatedButton>
           <DragDropContext onDragEnd={onDragEnd}>
             <Grid centered padded>
-              {boardData.columnOrder.map(columnId => (
+              {data.columnOrder.map(columnId => (
                 <Column
                   key={columnId}
-                  column={boardData.columns[columnId]}
-                  tasks={getTasks(boardData, columnId)}
+                  column={data.columns[columnId]}
+                  tasks={getTasks(data, columnId)}
                 />
               ))}
             </Grid>
