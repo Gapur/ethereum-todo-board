@@ -8,40 +8,25 @@ import { AnimatedButton, Column, TodoListModal } from './components';
 import { TODO_LIST_ABI, TODO_LIST_ADDRESS } from './constants/config';
 import { mutliDragAwareReorder } from './utils';
 
-const tasks = Array.from({ length: 8 }, (v, k) => k).map(
-  (val) => ({
-    id: `task-${val}`,
-    content: `Task ${val}`,
-  }),
-);
-
-const taskMap = tasks.reduce(
-  (previous, current) => {
-    previous[current.id] = current;
-    return previous;
-  },
-  {},
-);
-
-const todo = {
+const TODO = {
   id: 'todo',
   title: 'To do',
-  taskIds: tasks.map((task) => task.id),
+  taskIds: [],
 };
 
-const done = {
+const DONE = {
   id: 'done',
   title: 'Done',
   taskIds: [],
 };
 
 const initial = {
-  columnOrder: [todo.id, done.id],
+  columnOrder: [TODO.id, DONE.id],
   columns: {
-    [todo.id]: todo,
-    [done.id]: done,
+    [TODO.id]: TODO,
+    [DONE.id]: DONE,
   },
-  tasks: taskMap,
+  tasks: {},
 };
 
 const getTasks = (entities, columnId) =>
@@ -57,18 +42,23 @@ class App extends Component {
     try {
       const web3 = new Web3(Web3.currentProvider || "http://localhost:7545");
       const accounts = await web3.eth.getAccounts();
-      this.setState({ account: accounts[0] });
       const todoList = new web3.eth.Contract(TODO_LIST_ABI, TODO_LIST_ADDRESS);
-      this.setState({ todoList });
       const taskCount = await todoList.methods.taskCount().call();
-      this.setState({ taskCount });
+      const tasks = {};
       for (var i = 1; i <= taskCount; i++) {
         const task = await todoList.methods.tasks(i).call()
-        this.setState({
-          tasks: [...this.state.tasks, task]
-        })
+        tasks[task.id] = task;
       }
-      this.setState({ loading: false });
+      initial.tasks = tasks;
+      initial.columns[TODO.id] = {
+        ...TODO,
+        taskIds: Object.keys(tasks).filter(id => !tasks[id].completed)
+      };
+      initial.columns[DONE.id] = {
+        ...DONE,
+        taskIds: Object.keys(tasks).filter(id => tasks[id].completed)
+      };
+      this.setState({ entities: initial, loading: false, account: accounts[0], todoList });
     } catch (err) {
       console.log('err: ', err.message);
     }
@@ -79,8 +69,6 @@ class App extends Component {
 
     this.state = {
       account: '',
-      taskCount: 0,
-      tasks: [],
       loading: true,
       entities: initial,
       selectedTaskIds: [],
@@ -170,13 +158,12 @@ class App extends Component {
     this.setState({ loading: true })
     this.state.todoList.methods.toggleCompleted(taskId).send({ from: this.state.account })
     .once('receipt', () => {
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     });
   }
 
   render() {
-    const { entities, selectedTaskIds, tasks, loading, showModal } = this.state;
-    console.log('tasks', tasks);
+    const { entities, selectedTaskIds, loading, showModal } = this.state;
     return (
       <Container textAlign="center">
         <Pane height={24} />

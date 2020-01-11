@@ -6,8 +6,8 @@ import styled from 'styled-components';
 const DragCard = styled.div`
   padding-left: 12px;
   padding-right: 12px;
-  padding-top: 8px;
-  padding-bottom: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   border-radius: 2px;
   position: relative;
 `;
