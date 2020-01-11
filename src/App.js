@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import { Container, Header, Grid, Dimmer, Loader } from 'semantic-ui-react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { Container, Header, Dimmer, Grid, Loader } from 'semantic-ui-react';
 import { Pane } from 'evergreen-ui';
+import { DragDropContext } from 'react-beautiful-dnd';
+import Swal from 'sweetalert2';
 
 import { AnimatedButton, Column, TodoListModal } from './components';
 import { CONFIG, INITIAL, TODO, DONE } from './constants';
 import { reorderSingleDrag } from './utils';
+
+const getTasks = (boardData, columnId) =>
+  boardData.columns[columnId].taskIds.map((taskId) => boardData.tasks[taskId]);
 
 const App = () => {
   const [account, setAccount] = useState(null);
@@ -55,8 +59,7 @@ const App = () => {
       || source.droppableId === destination.droppableId) {
       return;
     }
-
-    onToggleCompleted(result.draggableId, destination.index);
+    onToggleCompleted(result.draggableId);
 
     const newBoardData = reorderSingleDrag({
       entities: boardData,
@@ -72,23 +75,24 @@ const App = () => {
       .createTask(title, description)
       .send({ from: account, gas: 3000000 })
       .once('receipt', (receipt) => {
+        Swal.fire({
+          text: 'Task created successfully.',
+          type: 'success',
+        });
         setLoading(false);
         setShowModal(false);
       });
   }
 
-  const onToggleCompleted = (taskId, index) => {
+  const onToggleCompleted = (taskId) => {
     setLoading(true);
     todoList.methods
-      .toggleCompleted(taskId, index)
+      .toggleCompleted(taskId)
       .send({ from: account })
       .once('receipt', () => {
         setLoading(false);
       });
   }
-
-  const getTasks = (boardData, columnId) =>
-    boardData.columns[columnId].taskIds.map((taskId) => boardData.tasks[taskId]);
 
   return (
     <Container textAlign="center">

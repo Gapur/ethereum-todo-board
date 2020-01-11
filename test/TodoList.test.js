@@ -17,7 +17,6 @@ contract('TodoList', (accounts) => {
     const taskCount = await this.todoList.taskCount();
     const task = await this.todoList.tasks(taskCount);
     assert.equal(task.id.toNumber(), taskCount.toNumber());
-    assert.equal(task.index.toNumber(), taskCount.toNumber());
     assert.equal(task.title, 'Welcome Ethereum-Todo-Board');
     assert.equal(task.description, 'Get Started');
     assert.equal(task.completed, false);
@@ -30,7 +29,6 @@ contract('TodoList', (accounts) => {
     assert.equal(taskCount, 2);
     const event = result.logs[0].args;
     assert.equal(event.id.toNumber(), 2);
-    assert.equal(event.index.toNumber(), 2);
     assert.equal(event.title, 'A new task');
     assert.equal(event.description, 'I created a new task');
     assert.equal(event.completed, false);
@@ -42,7 +40,6 @@ contract('TodoList', (accounts) => {
     assert.equal(task.completed, true);
     const event = result.logs[0].args;
     assert.equal(event.id.toNumber(), 1);
-    assert.equal(event.index.toNumber(), 1);
     assert.equal(event.completed, true);
   });
 });

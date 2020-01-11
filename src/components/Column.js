@@ -34,7 +34,6 @@ const Title = styled(Header)`
 `;
 
 const Column = ({ column, tasks }) => {
-  console.log('tasks', tasks);
   return (
     <GridColumn width={4}>
       <Title>{column.title}</Title>

@@ -1,4 +1,4 @@
-export const TODO_LIST_ADDRESS = '0xB828043804C5537dd936d56Cf792841740c85C32';
+export const TODO_LIST_ADDRESS = '0x952a7C0945C71acE80f9E6d08Be61408b35A986D';
 
 export const TODO_LIST_ABI = [
   {
@@ -18,12 +18,6 @@ export const TODO_LIST_ABI = [
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
         "internalType": "bool",
         "name": "completed",
         "type": "bool"
@@ -39,12 +33,6 @@ export const TODO_LIST_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "index",
         "type": "uint256"
       },
       {
@@ -101,11 +89,6 @@ export const TODO_LIST_ABI = [
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      },
-      {
         "internalType": "string",
         "name": "title",
         "type": "string"
@@ -151,11 +134,6 @@ export const TODO_LIST_ABI = [
       {
         "internalType": "uint256",
         "name": "_id",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_index",
         "type": "uint256"
       }
     ],
