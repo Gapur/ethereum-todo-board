@@ -1,4 +1,4 @@
-export const TODO_LIST_ADDRESS = '0xE59cA2DE29b36546e15EdE92B384b0548A4d567F';
+export const TODO_LIST_ADDRESS = '0xB828043804C5537dd936d56Cf792841740c85C32';
 
 export const TODO_LIST_ABI = [
   {
@@ -14,6 +14,12 @@ export const TODO_LIST_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
         "type": "uint256"
       },
       {
@@ -37,8 +43,20 @@ export const TODO_LIST_ABI = [
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "string",
-        "name": "content",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "description",
         "type": "string"
       },
       {
@@ -83,8 +101,18 @@ export const TODO_LIST_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
         "internalType": "string",
-        "name": "content",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
         "type": "string"
       },
       {
@@ -102,7 +130,12 @@ export const TODO_LIST_ABI = [
     "inputs": [
       {
         "internalType": "string",
-        "name": "_content",
+        "name": "_title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_desc",
         "type": "string"
       }
     ],
@@ -118,6 +151,11 @@ export const TODO_LIST_ABI = [
       {
         "internalType": "uint256",
         "name": "_id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_index",
         "type": "uint256"
       }
     ],

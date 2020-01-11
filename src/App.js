@@ -25,7 +25,7 @@ const App = () => {
       const taskCount = await todoList.methods.taskCount().call();
       const tasks = {};
       for (var i = 1; i <= taskCount; i++) {
-        const task = await todoList.methods.tasks(i).call()
+        const task = await todoList.methods.tasks(i).call();
         tasks[task.id] = task;
       }
       INITIAL.tasks = tasks;
@@ -51,12 +51,12 @@ const App = () => {
   const onDragEnd = (result) => {
     const destination = result.destination;
     const source = result.source;
-
-    if (!destination || result.reason === 'CANCEL') {
+    if (!destination || result.reason === 'CANCEL'
+      || source.droppableId === destination.droppableId) {
       return;
     }
 
-    onToggleCompleted(result.draggableId);
+    onToggleCompleted(result.draggableId, destination.index);
 
     const newBoardData = reorderSingleDrag({
       entities: boardData,
@@ -66,29 +66,29 @@ const App = () => {
     setBoardData(newBoardData);
   };
 
-  const onCreateTask = (formData) => {
+  const onCreateTask = ({ title, description }) => {
     setLoading(true);
     todoList.methods
-      .createTask(formData.title)
-      .send({ from: account })
-      .once('receipt', () => {
+      .createTask(title, description)
+      .send({ from: account, gas: 3000000 })
+      .once('receipt', (receipt) => {
         setLoading(false);
         setShowModal(false);
       });
   }
 
-  const onToggleCompleted = (taskId) => {
+  const onToggleCompleted = (taskId, index) => {
     setLoading(true);
     todoList.methods
-      .toggleCompleted(taskId)
+      .toggleCompleted(taskId, index)
       .send({ from: account })
       .once('receipt', () => {
         setLoading(false);
       });
   }
 
-  const getTasks = (entities, columnId) =>
-    entities.columns[columnId].taskIds.map((taskId) => entities.tasks[taskId]);
+  const getTasks = (boardData, columnId) =>
+    boardData.columns[columnId].taskIds.map((taskId) => boardData.tasks[taskId]);
 
   return (
     <Container textAlign="center">
@@ -103,13 +103,13 @@ const App = () => {
           </AnimatedButton>
           <DragDropContext onDragEnd={onDragEnd}>
             <Grid centered padded>
-              {boardData.columnOrder.map((columnId) => (
+              {boardData.columnOrder.map((columnId) =>
                 <Column
+                  key={columnId}
                   column={boardData.columns[columnId]}
                   tasks={getTasks(boardData, columnId)}
-                  key={columnId}
                 />
-              ))}
+              )}
             </Grid>
           </DragDropContext>
         </Pane>

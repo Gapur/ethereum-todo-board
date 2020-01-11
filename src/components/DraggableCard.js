@@ -24,8 +24,8 @@ const DraggableCard = ({ task, index }) => (
         >
           <Card>
             <Card.Content>
-              <Card.Header>{task.content}</Card.Header>
-              <Card.Description>Test</Card.Description>
+              <Card.Header>{task.title}</Card.Header>
+              <Card.Description>{task.description}</Card.Description>
             </Card.Content>
           </Card>
         </DragCard>
