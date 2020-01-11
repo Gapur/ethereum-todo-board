@@ -33,41 +33,22 @@ const Title = styled(Header)`
   }
 `;
 
-const Column = ({
-  column,
-  tasks,
-  selectedTaskIds,
-  toggleSelection,
-  toggleSelectionInGroup,
-}) => {
-  return (
-    <GridColumn width={4}>
-      <Title>{column.title}</Title>
-      <Droppable droppableId={column.id}>
-        {(provided, snapshot) => (
-          <TaskList
-            ref={provided.innerRef}
-            isDraggingOver={snapshot.isDraggingOver}
-            {...provided.droppableProps}
-          >
-            {tasks.map((task, index) => {
-              return (
-                <DraggableCard
-                  key={task.id}
-                  task={task}
-                  index={index}
-                  selectionCount={selectedTaskIds.length}
-                  toggleSelection={toggleSelection}
-                  toggleSelectionInGroup={toggleSelectionInGroup}
-                />
-              );
-            })}
-            {provided.placeholder}
-          </TaskList>
-        )}
-      </Droppable>
-    </GridColumn>
-  );
-}
+const Column = ({ column, tasks }) => (
+  <GridColumn width={4}>
+    <Title>{column.title}</Title>
+    <Droppable droppableId={column.id}>
+      {(provided, snapshot) => (
+        <TaskList
+          ref={provided.innerRef}
+          isDraggingOver={snapshot.isDraggingOver}
+          {...provided.droppableProps}
+        >
+          {tasks.map((task, index) => <DraggableCard key={task.id} task={task} index={index} />)}
+          {provided.placeholder}
+        </TaskList>
+      )}
+    </Droppable>
+  </GridColumn>
+);
 
 export default Column;
